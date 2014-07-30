@@ -34,6 +34,8 @@ try{
 //check if we got real id_token
 if ($id_token == null || !isset($id_token['payload']) || !is_array($id_token['payload'])) redirectTo($ret_addr);
 
+session_regenerate_id(true);
+
 $_SESSION['id']=array(
     'email' => $id_token['payload']['email'],
 //calculate user key
