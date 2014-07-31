@@ -4,6 +4,6 @@ This generator designated to pick some words from a dictionary based on the inpu
 Will adjust the result (perhaps generate algorithm?) based on password requirement (No digit? No special character?)
  */
 
-function generate($name, $gkey, $option=null){
+function generate($name, $ukey, $option=null){
     return "Not yet implemented";
 }

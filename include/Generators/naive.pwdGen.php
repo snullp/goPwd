@@ -4,5 +4,5 @@
  */
 
 function generate($name, $ukey, $option=null){
-    return sha1($name.$gkey);
+    return sha1($name.$ukey);
 }
