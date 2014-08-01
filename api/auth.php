@@ -39,7 +39,7 @@ session_regenerate_id(true);
 $_SESSION['id']=array(
     'email' => $id_token['payload']['email'],
 //calculate user key
-    'key' => sha1($id_token['payload']['aud'].':'.$id_token['payload']['sub'])
+    'key' => sha1($config['client_secret'].$id_token['payload']['sub'])
 );
 redirectTo($ret_addr);
 

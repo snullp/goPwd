@@ -22,7 +22,15 @@ if ($email == ''){
 <?php
 } else {
     //logged in, check available filters
-    $gens = array_diff(scandir('include/Generators'),Array(".",".."));
+    function gencheck($var){
+        $test = ".pwdGen.php";
+        $strlen = strlen($var);
+        $testlen = strlen($test);
+        if ($testlen > $strlen) return false;
+        return substr_compare($var, $test, $strlen - $testlen, $testlen)===0;
+    }
+
+    $gens = array_filter(scandir('include/Generators'),'gencheck');
     echo "Logged in as $email";
     echo  "<br>";
     if (isset($_GET['name'])){
