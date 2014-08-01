@@ -62,6 +62,10 @@ function get_auth_url(){
 }
 
 /*
-    Database related functions pending
+ per website configuration storage
  */
+function get_configs($name){
+}
 
+function set_configs($name, $config){
+}

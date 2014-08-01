@@ -1,16 +1,7 @@
 <?php
 
-$db=array(
-    'enabled' => false,
-    'host' => 'localhost',
-    'user' => '',
-    'passwd' => '',
-    'db' => ''
-);
-
 $config=array(
     'client_id' => 'xxxxx.apps.googleusercontent.com',
     'client_secret' => 'xxxxx',
     'redirect_uri' => 'https://your.site/api/auth.php',
-    'database' => $db
 );
