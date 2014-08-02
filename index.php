@@ -22,23 +22,11 @@ if ($email == ''){
 <?php
 } else {
     //logged in, check available filters
-    function gencheck($var){
-        $test = ".pwdGen.php";
-        $strlen = strlen($var);
-        $testlen = strlen($test);
-        if ($testlen > $strlen) return false;
-        return substr_compare($var, $test, $strlen - $testlen, $testlen)===0;
-    }
-
-    $gens = array_filter(scandir('include/Generators'),'gencheck');
     echo "Logged in as $email";
     echo  "<br>";
     if (isset($_GET['name'])){
         //process the query
-        if (in_array($_GET['generator'],$gens)){
-            require 'include/Generators/'.$_GET['generator'];
-            echo $_GET['generator'].": Password for ".$_GET['name'].": ".generate($_GET['name'], get_key());
-        }
+            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name']);
 
     }
 ?>
@@ -46,6 +34,7 @@ if ($email == ''){
 <input type="text" name="name"> 
 <select name="generator">
 <?php
+    $gens = get_pwdgen_list();
     foreach ($gens as $gen){
         echo "<option>".$gen."</option>";
     }
