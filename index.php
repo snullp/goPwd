@@ -26,10 +26,21 @@ if ($email == ''){
     echo  "<br>";
     if (isset($_GET['name'])){
         //process the query
+        if (!isset($_GET['update'])) {
+            echo "System found existing configurations:";
+            print_r(get_configs($_GET['name']));
+            echo "<br>";
             echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name']);
+        } else {
+            echo "Configurations updated:";
+            print_r($_GET['options']);
+            echo "<br>";
+            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$_GET['options']);
+        }
 
     }
 ?>
+<hr>
 <form action="." method="get">
 <input type="text" name="name"> 
 <select name="generator">
@@ -40,6 +51,10 @@ if ($email == ''){
     }
 ?>
 </select>
+<br>
+<input type="checkbox" name="update" value=1>Update
+<input type="checkbox" name="options[]" value="alllower">All Lower
+<input type="checkbox" name="options[]" value="nospecial">No Special
 <input type="submit" value="submit">
 
 </form>
