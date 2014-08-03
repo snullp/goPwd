@@ -69,13 +69,22 @@ function pad_or_truncate($str, $len){
     else return substr($str,0,$len);
 }
 
+function create_dir_if_nonexist($path){
+    if (!file_exists($path)){
+        mkdir($path, 0777, true);
+    }
+}
+
 function get_configs($name){
-    if (!file_exists(dirname(__FILE__)."/Configs/$name")) return null;
-    return json_decode(openssl_decrypt(file_get_contents(dirname(__FILE__)."/Configs/$name"),'des-cfb',get_key(),0,pad_or_truncate($name,8)),true);
+    $folder = dirname(__FILE__).'/Configs/'.get_email();
+    if (!file_exists($folder."/$name")) return null;
+    return json_decode(openssl_decrypt(file_get_contents($folder."/$name"),'des-cfb',get_key(),0,pad_or_truncate($name,8)),true);
 }
 
 function set_configs($name, $config){
-    file_put_contents(dirname(__FILE__)."/Configs/$name",openssl_encrypt(json_encode($config),'des-cfb',get_key(),0,pad_or_truncate($name,8)));
+    $folder = dirname(__FILE__).'/Configs/'.get_email();
+    create_dir_if_nonexist($folder);
+    file_put_contents($folder."/$name",openssl_encrypt(json_encode($config),'des-cfb',get_key(),0,pad_or_truncate($name,8)));
 }
 
 /*
