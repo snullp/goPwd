@@ -10,7 +10,7 @@ function hash_len($dict_size){
     return $len;
 }
 
-function generate($name, $ukey, $option=null){
+function generate($name, $ukey, $options=null){
     $dict_file = fopen(dirname(__FILE__) . '/dict','r');
     $dict = Array();
     while ($line = fgets($dict_file)){
@@ -35,15 +35,27 @@ function generate($name, $ukey, $option=null){
     $words_count = count($words);
     if ($words_count < 3) return "Dictionary too small";
 
+    $num = hexdec(substr($first,0,1));
+    $special = hexdec(substr($first,1,1))%2==0?'!':'?';
+
     srand(hexdec(substr($first,2)));
 
     $numbers = range(0,$words_count-1);
     shuffle($numbers);
 
     $result = "";
-    $result .= $words[$numbers[0]];
-    $result .= $words[$numbers[1]];
-    $result .= $words[$numbers[2]];
+    if (isset($options['plainpwd'])){
+        $result .= $words[$numbers[0]];
+        $result .= $words[$numbers[1]];
+        $result .= $words[$numbers[2]];
+    } else {
+        $result .= ucfirst($words[$numbers[0]]);
+        $result .= $num;
+        $result .= ucfirst($words[$numbers[1]]);
+        $result .= ucfirst($words[$numbers[2]]);
+        if (!isset($options['nospecial']))
+            $result .= $special;
+    }
 
     return $result;
 

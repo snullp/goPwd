@@ -28,13 +28,13 @@ if ($email == ''){
         //process the query
         if (!isset($_GET['update'])) {
             if ($options = get_configs($_GET['name'])){
-                echo "System found existing configurations:";
+                echo "System found existing configurations: ";
                 print_r($options);
             }
             echo "<br>";
             echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],null);
         } else {
-            echo "Configurations updated:";
+            echo "Configurations updated: ";
             //convert options
             $options = Array();
             foreach($_GET['options'] as $value){
@@ -49,7 +49,7 @@ if ($email == ''){
 ?>
 <hr>
 <form action="." method="get">
-<input type="text" name="name"> 
+<input type="text" name="name" value="<?php echo $_GET['name']; ?>"> 
 <select name="generator">
 <?php
     $gens = get_pwdgen_list();
@@ -59,8 +59,8 @@ if ($email == ''){
 ?>
 </select>
 <br>
-<input type="checkbox" name="update" value=1>Update
-<input type="checkbox" name="options[]" value="alllower">All Lower
+<input type="checkbox" name="update" value=1>Update: 
+<input type="checkbox" name="options[]" value="plainpwd">Plain Pwd
 <input type="checkbox" name="options[]" value="nospecial">No Special
 <input type="submit" value="submit">
 
