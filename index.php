@@ -27,15 +27,22 @@ if ($email == ''){
     if (isset($_GET['name'])){
         //process the query
         if (!isset($_GET['update'])) {
-            echo "System found existing configurations:";
-            print_r(get_configs($_GET['name']));
+            if ($options = get_configs($_GET['name'])){
+                echo "System found existing configurations:";
+                print_r($options);
+            }
             echo "<br>";
-            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name']);
+            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],null);
         } else {
             echo "Configurations updated:";
-            print_r($_GET['options']);
+            //convert options
+            $options = Array();
+            foreach($_GET['options'] as $value){
+                $options[$value] = true;
+            }
+            print_r($options);
             echo "<br>";
-            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$_GET['options']);
+            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
         }
 
     }
