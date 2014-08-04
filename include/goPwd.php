@@ -1,6 +1,6 @@
 <?php
-require_once 'config.php';
 set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
+require_once 'config.php';
 require_once 'Google/Client.php';
 
 if (session_id() === '') session_start();
@@ -76,12 +76,14 @@ function create_dir_if_nonexist($path){
 }
 
 function get_configs($name){
+    $name = urlencode($name);
     $folder = dirname(__FILE__).'/Configs/'.get_email();
     if (!file_exists($folder."/$name")) return null;
     return json_decode(openssl_decrypt(file_get_contents($folder."/$name"),'des-cfb',get_key(),0,pad_or_truncate($name,8)),true);
 }
 
 function set_configs($name, $config){
+    $name = urlencode($name);
     $folder = dirname(__FILE__).'/Configs/'.get_email();
     create_dir_if_nonexist($folder);
     file_put_contents($folder."/$name",openssl_encrypt(json_encode($config),'des-cfb',get_key(),0,pad_or_truncate($name,8)));
@@ -102,10 +104,11 @@ function get_pwdgen_list(){
 }
 
 function get_pwd($gen, $name, $configs=null){
-    if (!in_array($gen, get_pwdgen_list())) return "";
     if ($name === "") return "";
     if ($configs!==null) set_configs($name,$configs);
     else $configs = get_configs($name);
+    if (isset($configs['generator'])) $gen = $configs['generator'];
+    if (!in_array($gen, get_pwdgen_list())) return "";
     require_once dirname(__FILE__)."/Generators/$gen";
     return generate($name, get_key(), $configs);
 }

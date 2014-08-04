@@ -1,11 +1,5 @@
-<?php
-/*
- Warning: this file is not properly written as it contains several security
- vulnerabilities. DO NOT USE in real practice.
-
- */
-?>
 <!DOCTYPE html>
+<!-- Warning: this file is not properly written as it contains several security vulnerabilities. DO NOT USE in real practice. -->
 <html>
 <head>
 <title>A simple password manager</title>
@@ -42,9 +36,10 @@ if ($email == ''){
                     $options[$value] = true;
                 }
             }
+            $options['generator'] = $_GET['generator'];
             print_r($options);
             echo "<br>";
-            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
+            echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
         }
 
     }
@@ -61,9 +56,9 @@ if ($email == ''){
 ?>
 </select>
 <br>
-<input type="checkbox" name="update" value=1>Update: 
-<input type="checkbox" name="options[]" value="plainpwd">Plain Pwd
-<input type="checkbox" name="options[]" value="nospecial">No Special
+<input id="update-check" type="checkbox" name="update" value=1>Update: 
+<input type="checkbox" name="options[]" value="plainpwd" disabled>Plain Pwd
+<input type="checkbox" name="options[]" value="nospecial" disabled>No Special
 <input type="submit" value="submit">
 
 </form>
@@ -71,4 +66,19 @@ if ($email == ''){
 }
 ?>
 </body>
+<script type="text/javascript">
+(function(){
+    var checkbox = document.getElementById('update-check');
+    checkbox.addEventListener('click',function(){
+        var list = document.getElementsByName('options[]');
+        for (var i=0; i<list.length; i++){
+            if (checkbox.checked){
+                list[i].disabled = false;
+            }else{
+                list[i].disabled = true;
+            }
+        }
+    });
+})();
+</script>
 </html>

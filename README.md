@@ -15,6 +15,6 @@ The framework itself (include/goPwd.php) provides interfaces that can invoke Goo
 
 The OAuth API file (api/auth.php) receives what Google returned to us and do necessary processing.
 
-The passwords generators (include/Generators) is the actual algorithm that turn the name of the entity and the master key to the password. All current generators are only examples and not considered secure.
+The passwords generators (include/Generators) are the actual algorithms that turn the name of the entity and the master key to the password. All current generators are only examples and not considered secure.
 
-Generators takes 3 parameters: the name of the entity, the masterkey and an options array. The generator returns a string as the generated password.
+A generator takes 3 parameters: the name of the entity, the masterkey and an options array. The generator returns a string as the generated password.
