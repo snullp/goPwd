@@ -3,7 +3,7 @@ require_once 'config.php';
 set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 require_once 'Google/Client.php';
 
-if (session_id() == '') session_start();
+if (session_id() === '') session_start();
 
 /*
     If user is authenticated, return user's email address
@@ -29,7 +29,7 @@ function get_key(){
 function get_gclient($state = null){
     global $config;
     global $_client;
-    if ($_client == null){
+    if ($_client === null){
         $client = new Google_Client();
         $client->setClientId($config['client_id']);
         $client->setClientSecret($config['client_secret']);
@@ -103,9 +103,9 @@ function get_pwdgen_list(){
 
 function get_pwd($gen, $name, $configs=null){
     if (!in_array($gen, get_pwdgen_list())) return "";
-    if ($name == "") return "";
-    require_once dirname(__FILE__)."/Generators/$gen";
-    if ($configs!=null) set_configs($name,$configs);
+    if ($name === "") return "";
+    if ($configs!==null) set_configs($name,$configs);
     else $configs = get_configs($name);
+    require_once dirname(__FILE__)."/Generators/$gen";
     return generate($name, get_key(), $configs);
 }

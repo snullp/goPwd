@@ -37,8 +37,10 @@ if ($email == ''){
             echo "Configurations updated: ";
             //convert options
             $options = Array();
-            foreach($_GET['options'] as $value){
-                $options[$value] = true;
+            if (isset($_GET['options'])) {
+                foreach($_GET['options'] as $value){
+                    $options[$value] = true;
+                }
             }
             print_r($options);
             echo "<br>";
@@ -49,7 +51,7 @@ if ($email == ''){
 ?>
 <hr>
 <form action="." method="get">
-<input type="text" name="name" value="<?php echo $_GET['name']; ?>"> 
+<input type="text" name="name" value="<?php if(isset($_GET['name'])) echo $_GET['name']; ?>"> 
 <select name="generator">
 <?php
     $gens = get_pwdgen_list();
