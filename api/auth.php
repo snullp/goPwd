@@ -7,6 +7,8 @@ function redirectTo($uri = '/'){
     die();
 }
 
+if (!isset($_GET['state']) || !isset($_GET['code'])) redirectTo('/');
+
 $state_array = json_decode($_GET['state'],true);
 
 //cannot decode state query as json
