@@ -20,26 +20,32 @@ if ($email == ''){
     echo  "<br>";
     if (isset($_GET['name'])){
         //process the query
-        if (!isset($_GET['update'])) {
-            if ($options = get_configs($_GET['name'])){
-                echo "System found existing configurations: ";
-                print_r($options);
-            }
+        if (isset($_GET['clear'])){
+            echo "System configuration cleared";
             echo "<br>";
-            echo $_GET['generator'].": Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],null);
-        } else {
-            echo "Configurations updated: ";
-            //convert options
-            $options = Array();
-            if (isset($_GET['options'])) {
-                foreach($_GET['options'] as $value){
-                    $options[$value] = true;
+            echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],Array());
+        }else{
+            if (!isset($_GET['update'])) {
+                if ($options = get_configs($_GET['name'])){
+                    echo "System found existing configurations: ";
+                    print_r($options);
                 }
+                echo "<br>";
+                echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],null);
+            } else {
+                echo "Configurations updated: ";
+                //convert options
+                $options = Array();
+                if (isset($_GET['options'])) {
+                    foreach($_GET['options'] as $value){
+                        $options[$value] = true;
+                    }
+                }
+                $options['generator'] = $_GET['generator'];
+                print_r($options);
+                echo "<br>";
+                echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
             }
-            $options['generator'] = $_GET['generator'];
-            print_r($options);
-            echo "<br>";
-            echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
         }
 
     }
@@ -51,12 +57,15 @@ if ($email == ''){
 <?php
     $gens = get_pwdgen_list();
     foreach ($gens as $gen){
-        echo "<option>".$gen."</option>";
+        $selmark = "";
+        if ($_GET['generator']==$gen) $selmark="selected";
+        echo "<option $selmark>".$gen."</option>";
     }
 ?>
 </select>
 <br>
-<input id="update-check" type="checkbox" name="update" value=1>Update: 
+<input type="checkbox" name="clear" value=1>Clear all
+<input id="update-check" type="checkbox" name="update" value=1>Set: 
 <input type="checkbox" name="options[]" value="plainpwd" disabled>Plain Pwd
 <input type="checkbox" name="options[]" value="nospecial" disabled>No Special
 <input type="submit" value="submit">
