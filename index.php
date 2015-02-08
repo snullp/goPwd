@@ -1,3 +1,6 @@
+<?php
+require_once 'include/goPwd.php';
+?>
 <!DOCTYPE html>
 <!-- Warning: this file is not properly written as it contains several security vulnerabilities. DO NOT USE in real practice. -->
 <html>
@@ -6,8 +9,6 @@
 </head>
 <body>
 <?php
-require_once 'include/goPwd.php';
-
 $email = get_email();
 if ($email === '') {
     //not logged in
