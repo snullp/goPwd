@@ -5,6 +5,30 @@ require_once 'Google/Client.php';
 
 if (session_id() === '') session_start();
 
+// import all generator settings
+function get_pwdgen_list() {
+    return array_filter(scandir(dirname(__FILE__).'/Generators'),
+        function ($var){
+            $test = ".pwdGen.php";
+            $strlen = strlen($var);
+            $testlen = strlen($test);
+            if ($testlen > $strlen) return false;
+            return substr_compare($var,
+                                  $test,
+                                  $strlen - $testlen,
+                                  $testlen)===0;
+        });
+}
+
+function init_generators() {
+    global $generators;
+    $generator_php_files = get_pwdgen_list();
+    
+    foreach ($generator_php_files as $gen_file) {
+        require_once "Generators/$gen_file";
+    }
+}
+
 /*
     If user is authenticated, return user's email address
  */
@@ -64,51 +88,90 @@ function get_auth_url(){
 /*
  per website configuration storage
  */
-function pad_or_truncate($str, $len){
-    if (strlen($str)< $len) return str_pad($str,$len);
-    else return substr($str,0,$len);
+
+// extend or truncate a string to given length, used by openssl lib
+function pad_or_truncate($str, $len) {
+    if (strlen($str)< $len) {
+        return str_pad($str,$len);
+    } else {
+        return substr($str,0,$len);
+    }
 }
 
-function create_dir_if_nonexist($path){
-    if (!file_exists($path)){
+function create_dir_if_nonexist($path) {
+    if (!file_exists($path)) {
         mkdir($path, 0777, true);
     }
 }
 
-function get_configs($name){
+function get_config($name) {
     $name = urlencode($name);
     $folder = dirname(__FILE__).'/Configs/'.get_email();
-    if (!file_exists($folder."/$name")) return null;
-    return json_decode(openssl_decrypt(file_get_contents($folder."/$name"),'des-cfb',get_key(),0,pad_or_truncate($name,8)),true);
+
+    if (!file_exists($folder."/$name")) {
+        return null;
+    }
+
+    return json_decode(
+                openssl_decrypt(
+                    file_get_contents($folder."/$name"),
+                    'des-cfb',
+                    get_key(),
+                    0,
+                    pad_or_truncate($name,8)),
+                true);
 }
 
-function set_configs($name, $config){
+function set_config($name, $config) {
     $name = urlencode($name);
     $folder = dirname(__FILE__).'/Configs/'.get_email();
+
     create_dir_if_nonexist($folder);
-    file_put_contents($folder."/$name",openssl_encrypt(json_encode($config),'des-cfb',get_key(),0,pad_or_truncate($name,8)));
+
+    file_put_contents(
+        $folder."/$name",
+        openssl_encrypt(
+            json_encode($config),
+            'des-cfb',
+            get_key(),
+            0,pad_or_truncate($name,8)
+        ));
 }
 
 /*
  password generator interfaces
  */
 
-function get_pwdgen_list(){
-    return array_filter(scandir(dirname(__FILE__).'/Generators'),function ($var){
-        $test = ".pwdGen.php";
-        $strlen = strlen($var);
-        $testlen = strlen($test);
-        if ($testlen > $strlen) return false;
-        return substr_compare($var, $test, $strlen - $testlen, $testlen)===0;
-    });
-}
+function get_pwd($name, $userinput=null) {
+    if ($name === '') return '';
 
-function get_pwd($gen, $name, $configs=null){
-    if ($name === "") return "";
-    if ($configs!==null) set_configs($name,$configs);
-    else $configs = get_configs($name);
-    if (isset($configs['generator'])) $gen = $configs['generator'];
-    if (!in_array($gen, get_pwdgen_list())) return "";
-    require_once dirname(__FILE__)."/Generators/$gen";
-    return generate($name, get_key(), $configs);
+    global $generators;
+
+    if ($userinput == null) {
+
+        $config = get_config($name);
+        if ($config == null) {
+            return null;
+        }
+
+        $generator = $config['generator'];
+
+        print "<p class='debug'>Debug: Using $generator with ";
+        print_r($config);
+        print '</p>';
+
+        return $generators[$generator]['function']($name, get_key(), $config);
+
+    } else {
+
+        $generator = $userinput['generator'];
+        set_config($name, $userinput);
+
+        print "<p class='debug'>Debug: Using $generator with ";
+        print_r($userinput);
+        print '</p>';
+
+        return $generators[$generator]['function']($name, get_key(), $userinput);
+
+    }
 }

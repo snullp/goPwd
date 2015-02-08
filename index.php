@@ -9,85 +9,88 @@
 require_once 'include/goPwd.php';
 
 $email = get_email();
-if ($email == ''){
+if ($email === '') {
     //not logged in
 ?>
     <a href="<?php echo get_auth_url();?>"> login </a>
 <?php
 } else {
+    init_generators();
     //logged in, check available filters
-    echo "Logged in as $email";
-    echo  "<br>";
-    if (isset($_GET['name'])){
+    echo "<p>Logged in as $email</p>\n";
+    if (isset($_GET['name']) && isset($_GET['generator'])) {
         //process the query
-        if (isset($_GET['clear'])){
-            echo "System configuration cleared";
-            echo "<br>";
-            echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],Array());
-        }else{
-            if (!isset($_GET['update'])) {
-                if ($options = get_configs($_GET['name'])){
-                    echo "System found existing configurations: ";
-                    print_r($options);
-                }
-                echo "<br>";
-                echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],null);
+        switch($_GET['generator']){
+        case 'Saved':
+            if ($pwd = get_pwd($_GET['name'])){
+                echo "<p>Password for ".$_GET['name'].": $pwd</p>";
             } else {
-                echo "Configurations updated: ";
-                //convert options
-                $options = Array();
-                if (isset($_GET['options'])) {
-                    foreach($_GET['options'] as $value){
-                        $options[$value] = true;
-                    }
-                }
-                $options['generator'] = $_GET['generator'];
-                print_r($options);
-                echo "<br>";
-                echo "Password for ".$_GET['name'].": ".get_pwd($_GET['generator'],$_GET['name'],$options);
+                echo "<p>Error: No existing configs found.</p>";
             }
+            break;
+        default:
+            $configs = array('generator' => $_GET['generator']);
+            foreach ($_GET as $rkey => $value) {
+                if (strncmp($rkey, 'conf_', 5) === 0) {
+                    $key = substr($rkey, 5);
+                    $configs[$key] = $value;
+                }
+            }
+            echo "<p>Password for ".$_GET['name'].": ".get_pwd($_GET['name'], $configs)."</p>";
+            break;
         }
-
     }
 ?>
 <hr>
-<form action="." method="get">
+<form id="user-input" action="." method="get">
+<p>
 <input type="text" name="name" value="<?php if(isset($_GET['name'])) echo $_GET['name']; ?>"> 
-<select name="generator">
+<select id="gen-selector" name="generator">
 <?php
-    $gens = get_pwdgen_list();
-    foreach ($gens as $gen){
-        $selmark = "";
-        if ($_GET['generator']==$gen) $selmark="selected";
-        echo "<option $selmark>".$gen."</option>";
+    echo "<option selected>Saved</option>";
+    foreach ($generators as $gen => $value){
+        echo "<option>".$gen."</option>";
     }
 ?>
 </select>
-<br>
-<input type="checkbox" name="clear" value=1>Clear all
-<input id="update-check" type="checkbox" name="update" value=1>Set: 
-<input type="checkbox" name="options[]" value="plainpwd" disabled>Plain Pwd
-<input type="checkbox" name="options[]" value="nospecial" disabled>No Special
-<input type="submit" value="submit">
-
+</p>
+<div id="user-configs">
+</div>
+<p><input type="submit" value="submit"></p>
 </form>
 <?php
 }
 ?>
 </body>
+<?php if ($email !== '') { ?>
 <script type="text/javascript">
 (function(){
-    var checkbox = document.getElementById('update-check');
-    checkbox.addEventListener('click',function(){
-        var list = document.getElementsByName('options[]');
-        for (var i=0; i<list.length; i++){
-            if (checkbox.checked){
-                list[i].disabled = false;
-            }else{
-                list[i].disabled = true;
-            }
+    var gendata = {<?php
+foreach ($generators as $name => $value) {
+    echo "'$name' : {";
+    foreach ($generators[$name]['require'] as $key => $value) {
+        echo "'$key' : '$value',";
+    }
+    echo "},";
+}
+?>
+    };
+    var sel = document.getElementById('gen-selector');
+    sel.addEventListener('change', function() {
+        var container = document.getElementById('user-configs');
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        if (sel.value === 'Saved') return;
+        for (var key in gendata[sel.value]){
+            var newfield = document.createElement("p");
+            container.appendChild(newfield);
+            newfield.innerHTML = key + 
+                                 ': <input type="text" name="conf_' + key + '" value="' +
+                                 gendata[sel.value][key] + '">';
         }
     });
 })();
 </script>
+<?php } ?>
 </html>

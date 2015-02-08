@@ -10,53 +10,60 @@ function hash_len($dict_size){
     return $len;
 }
 
-function generate($name, $ukey, $options=null){
-    $dict_file = fopen(dirname(__FILE__) . '/dict','r');
-    $dict = Array();
-    while ($line = fgets($dict_file)){
-        $dict[] = trim($line);
-    }
-    $dict_size = count($dict);
-    $hash_len = hash_len($dict_size);
+$generators['Dict'] = array(
+    'require' => array('plainpwd' => 0, 'nospecial' => 0),
+    'function' => function($name, $ukey, $options) {
+        $dict_file = fopen(dirname(__FILE__) . '/dict','r');
+        $dict = Array();
 
-    $hash = md5($name.$ukey);
+        while ($line = fgets($dict_file)) {
+            $dict[] = trim($line);
+        }
 
-    $first = substr($hash,0,4);
-    $rest = substr($hash,4);
+        $dict_size = count($dict);
+        $hash_len = hash_len($dict_size);
 
-    $words = Array();
-    $rest_len = strlen($rest);
-    while ($rest_len > $hash_len){
-        $index = substr($rest,0,$hash_len);
-        $rest = substr($rest,$hash_len);
-        $rest_len -= $hash_len;
-        $words[] = $dict[hexdec($index) % $dict_size];
-    }
-    $words_count = count($words);
-    if ($words_count < 3) return "Dictionary too small";
+        $hash = md5($name.$ukey);
 
-    $num = hexdec(substr($first,0,1));
-    $special = hexdec(substr($first,1,1))%2==0?'!':'?';
+        $first = substr($hash,0,4);
+        $rest = substr($hash,4);
 
-    srand(hexdec(substr($first,2)));
+        $words = Array();
+        $rest_len = strlen($rest);
 
-    $numbers = range(0,$words_count-1);
-    shuffle($numbers);
+        while ($rest_len > $hash_len) {
+            $index = substr($rest,0,$hash_len);
+            $rest = substr($rest,$hash_len);
+            $rest_len -= $hash_len;
+            $words[] = $dict[hexdec($index) % $dict_size];
+        }
 
-    $result = "";
-    if (isset($options['plainpwd'])){
-        $result .= $words[$numbers[0]];
-        $result .= $words[$numbers[1]];
-        $result .= $words[$numbers[2]];
-    } else {
-        $result .= ucfirst($words[$numbers[0]]);
-        $result .= $num;
-        $result .= ucfirst($words[$numbers[1]]);
-        $result .= ucfirst($words[$numbers[2]]);
-        if (!isset($options['nospecial']))
-            $result .= $special;
-    }
+        $words_count = count($words);
+        if ($words_count < 3) return "Dictionary too small";
 
-    return $result;
+        $num = hexdec(substr($first,0,1));
+        $special = hexdec(substr($first,1,1))%2==0?'!':'?';
 
-}
+        srand(hexdec(substr($first,2)));
+
+        $numbers = range(0,$words_count-1);
+        shuffle($numbers);
+
+        $result = "";
+        if ($options['plainpwd'] !== '0'){
+            $result .= $words[$numbers[0]];
+            $result .= $words[$numbers[1]];
+            $result .= $words[$numbers[2]];
+        } else {
+            $result .= ucfirst($words[$numbers[0]]);
+            $result .= $num;
+            $result .= ucfirst($words[$numbers[1]]);
+            $result .= ucfirst($words[$numbers[2]]);
+            if ($options['nospecial'] === '0')
+                $result .= $special;
+        }
+
+        return $result;
+
+    });
+
