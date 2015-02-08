@@ -5,6 +5,10 @@ require_once 'Google/Client.php';
 
 if (session_id() === '') session_start();
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 // import all generator settings
 function get_pwdgen_list() {
     return array_filter(scandir(dirname(__FILE__).'/Generators'),
