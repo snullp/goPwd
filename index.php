@@ -46,12 +46,7 @@ if ($email === '') {
 <p>
 <input type="text" name="name" value="<?php if(isset($_GET['name'])) echo $_GET['name']; ?>"> 
 <select id="gen-selector" name="generator">
-<?php
-    echo "<option selected>Saved</option>";
-    foreach ($generators as $gen => $value){
-        echo "<option>".$gen."</option>";
-    }
-?>
+    <option selected>Saved</option>
 </select>
 </p>
 <div id="user-configs">
@@ -76,13 +71,18 @@ foreach ($generators as $name => $value) {
 ?>
     };
     var sel = document.getElementById('gen-selector');
+    for (var key in gendata) {
+        var option = document.createElement('option');
+        option.innerHTML = key;
+        sel.appendChild(option);
+    }
     sel.addEventListener('change', function() {
         var container = document.getElementById('user-configs');
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
         if (sel.value === 'Saved') return;
-        for (var key in gendata[sel.value]){
+        for (var key in gendata[sel.value]) {
             var newfield = document.createElement("p");
             container.appendChild(newfield);
             newfield.innerHTML = key + 
