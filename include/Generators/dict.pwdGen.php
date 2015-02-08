@@ -12,7 +12,7 @@ function hash_len($dict_size){
 
 $generators['Dict'] = array(
     'require' => array('plainpwd' => 0, 'nospecial' => 0),
-    'function' => function($name, $ukey, $options) {
+    'function' => function($name, $ukey, $argv) {
         $dict_file = fopen(dirname(__FILE__) . '/dict','r');
         $dict = Array();
 
@@ -50,7 +50,7 @@ $generators['Dict'] = array(
         shuffle($numbers);
 
         $result = "";
-        if ($options['plainpwd'] !== '0'){
+        if ($argv['plainpwd'] !== '0'){
             $result .= $words[$numbers[0]];
             $result .= $words[$numbers[1]];
             $result .= $words[$numbers[2]];
@@ -59,7 +59,7 @@ $generators['Dict'] = array(
             $result .= $num;
             $result .= ucfirst($words[$numbers[1]]);
             $result .= ucfirst($words[$numbers[2]]);
-            if ($options['nospecial'] === '0')
+            if ($argv['nospecial'] === '0')
                 $result .= $special;
         }
 

@@ -29,35 +29,36 @@ if ($email === '') {
             }
             break;
         default:
-            $configs = array('generator' => $_GET['generator']);
+            $argv = array('generator' => $_GET['generator']);
             foreach ($_GET as $rkey => $value) {
                 if (strncmp($rkey, 'conf_', 5) === 0) {
                     $key = substr($rkey, 5);
-                    $configs[$key] = $value;
+                    $argv[$key] = $value;
                 }
             }
-            echo "<p>Password for ".$_GET['name'].": ".get_pwd($_GET['name'], $configs)."</p>";
+
+            if ($pwd = get_pwd($_GET['name'], $argv)){
+                echo "<p>Password for ".$_GET['name'].": $pwd</p>";
+            } else {
+                echo "<p>Error.</p>";
+            }
             break;
         }
     }
 ?>
 <hr>
-<form id="user-input" action="." method="get">
+<form action="." method="get">
 <p>
 <input type="text" name="name" value="<?php if(isset($_GET['name'])) echo $_GET['name']; ?>"> 
 <select id="gen-selector" name="generator">
     <option selected>Saved</option>
 </select>
 </p>
-<div id="user-configs">
+<div id="user-argv">
 </div>
 <p><input type="submit" value="submit"></p>
 </form>
-<?php
-}
-?>
-</body>
-<?php if ($email !== '') { ?>
+
 <script type="text/javascript">
 (function(){
     var gendata = {<?php
@@ -68,8 +69,7 @@ foreach ($generators as $name => $value) {
     }
     echo "},";
 }
-?>
-    };
+?>};
     var sel = document.getElementById('gen-selector');
     for (var key in gendata) {
         var option = document.createElement('option');
@@ -77,7 +77,7 @@ foreach ($generators as $name => $value) {
         sel.appendChild(option);
     }
     sel.addEventListener('change', function() {
-        var container = document.getElementById('user-configs');
+        var container = document.getElementById('user-argv');
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
@@ -93,4 +93,5 @@ foreach ($generators as $name => $value) {
 })();
 </script>
 <?php } ?>
+</body>
 </html>

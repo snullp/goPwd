@@ -6,6 +6,6 @@
 
 $generators['Hash'] = array(
     'require' => array(),
-    'function' => function($name, $ukey, $options) {
+    'function' => function($name, $ukey, $argv) {
         return sha1($name.$ukey);
     });

@@ -5,8 +5,8 @@
 
 $generators['Random'] = array(
     'require' => array('seed' => rand()),
-    'function' => function($name, $ukey, $options){
-        $number = intval($options['seed']);
+    'function' => function($name, $ukey, $argv){
+        $number = intval($argv['seed']);
 
         srand($number);
         $result = "";

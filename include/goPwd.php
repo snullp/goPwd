@@ -142,36 +142,39 @@ function set_config($name, $config) {
  password generator interfaces
  */
 
-function get_pwd($name, $userinput=null) {
+function get_pwd($name, $user_argv=null) {
     if ($name === '') return '';
 
     global $generators;
 
-    if ($userinput == null) {
+    if ($user_argv == null) {
 
-        $config = get_config($name);
-        if ($config == null) {
+        $argv = get_config($name);
+        if ($argv == null) {
             return null;
         }
 
-        $generator = $config['generator'];
+        $generator = $argv['generator'];
 
         print "<p class='debug'>Debug: Using $generator with ";
-        print_r($config);
+        print_r($argv);
         print '</p>';
 
-        return $generators[$generator]['function']($name, get_key(), $config);
+        return $generators[$generator]['function']($name, get_key(), $argv);
 
     } else {
 
-        $generator = $userinput['generator'];
-        set_config($name, $userinput);
+        $generator = $user_argv['generator'];
+
+        if (!isset($generators[$generator])) return null;
+
+        set_config($name, $user_argv);
 
         print "<p class='debug'>Debug: Using $generator with ";
-        print_r($userinput);
+        print_r($user_argv);
         print '</p>';
 
-        return $generators[$generator]['function']($name, get_key(), $userinput);
+        return $generators[$generator]['function']($name, get_key(), $user_argv);
 
     }
 }
