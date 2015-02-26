@@ -6,6 +6,8 @@
 $generators['Random'] = array(
     'require' => array('seed' => rand()),
     'function' => function($name, $ukey, $argv){
+        // seed is not specified, cannot generate a new one and save to conf, abort.
+        if (!isset($argv['seed'])) return 0;
         $number = intval($argv['seed']);
 
         srand($number);

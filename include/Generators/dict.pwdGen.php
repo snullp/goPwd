@@ -50,7 +50,7 @@ $generators['Dict'] = array(
         shuffle($numbers);
 
         $result = "";
-        if ($argv['plainpwd'] !== '0'){
+        if (isset($argv['plainpwd']) && $argv['plainpwd'] !== '0'){
             $result .= $words[$numbers[0]];
             $result .= $words[$numbers[1]];
             $result .= $words[$numbers[2]];
@@ -59,7 +59,7 @@ $generators['Dict'] = array(
             $result .= $num;
             $result .= ucfirst($words[$numbers[1]]);
             $result .= ucfirst($words[$numbers[2]]);
-            if ($argv['nospecial'] === '0')
+            if (isset($argv['nospecial']) && $argv['nospecial'] === '0')
                 $result .= $special;
         }
 

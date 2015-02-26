@@ -147,14 +147,14 @@ function set_config($name, $config) {
  */
 
 function get_pwd($name, $user_argv=null) {
-    if ($name === '') return '';
+    if (!isset($name) || $name === '') return null;
 
     global $generators;
 
-    if ($user_argv == null) {
+    if ($user_argv === null) {
 
         $argv = get_config($name);
-        if ($argv == null) {
+        if ($argv === null) {
             return null;
         }
 
@@ -167,8 +167,11 @@ function get_pwd($name, $user_argv=null) {
         return $generators[$generator]['function']($name, get_key(), $argv);
 
     } else {
-
-        $generator = $user_argv['generator'];
+        if (isset($user_argv['generator']) {
+            $generator = $user_argv['generator'];
+        } else {
+            return null;
+        }
 
         if (!isset($generators[$generator])) return null;
 
